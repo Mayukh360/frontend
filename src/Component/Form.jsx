@@ -8,11 +8,11 @@ export default function Form() {
     phone: "",
   });
   const [userData, setUserdata] = useState([]);
+  const [selectedItem, setSelectedItem] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       const response = await axios.get("http://localhost:3000/getData");
-      // console.log(response.data);
       setUserdata(response.data);
     };
     fetchData();
@@ -27,39 +27,76 @@ export default function Form() {
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();
-    // Perform any actions with the form data here, such as making an API request
 
-    await axios.post("http://localhost:3000/getData", data);
-    event.target.reset();
-    const response = await axios.get("http://localhost:3000/getData");
-    // console.log(response.data);
-    setUserdata(response.data);
+    if (selectedItem) {
+      const updatedData = {
+        id: selectedItem.id,
+        name: event.target.name.value,
+        email: event.target.email.value,
+        phone: event.target.phone.value,
+      };
+
+      await axios.put(
+        `http://localhost:3000/getData/${selectedItem.id}`,
+        updatedData
+      );
+
+      setSelectedItem(null);
+      setData({
+        name: "",
+        email: "",
+        phone: "",
+      });
+
+      const response = await axios.get("http://localhost:3000/getData");
+      setUserdata(response.data);
+    } else {
+      await axios.post("http://localhost:3000/getData", {
+        name: event.target.name.value,
+        email: event.target.email.value,
+        phone: event.target.phone.value,
+      });
+
+      event.target.reset();
+
+      const response = await axios.get("http://localhost:3000/getData");
+      setUserdata(response.data);
+    }
   };
-  const dltBtnhandler = (item) => {
-    // console.log(item.id);
-    const filteredData=userData.filter(product=>product.id!==item.id)
+
+  const dltBtnhandler = async (item) => {
+    const filteredData = userData.filter((product) => product.id !== item.id);
     setUserdata(filteredData);
-    axios.delete(`http://localhost:3000/getData/${item.id}`)
+    await axios.delete(`http://localhost:3000/getData/${item.id}`);
+  };
+
+  const editBtnHandler = (item) => {
+    setSelectedItem(item);
+    setData({
+      name: item.name,
+      email: item.email,
+      phone: item.phone,
+    });
   };
 
   return (
     <div>
       <form onSubmit={onSubmitHandler}>
         <label>Name</label>
-        <input onChange={onChangeHandler} type="text" name="name" />
+        <input onChange={onChangeHandler} type="text" name="name" value={data.name} />
         <label>Email</label>
-        <input onChange={onChangeHandler} type="email" name="email" />
+        <input onChange={onChangeHandler} type="email" name="email" value={data.email} />
         <label>Phone</label>
-        <input onChange={onChangeHandler} type="tel" name="phone" />
-        <button type="submit">Submit</button>
+        <input onChange={onChangeHandler} type="tel" name="phone" value={data.phone} />
+        <button type="submit">{selectedItem ? "Update" : "Submit"}</button>
       </form>
       {userData &&
         userData.map((item) => (
           <li key={item.id}>
             <h3>
-               Name :{item.name}--Email :{item.email}---Phone :
-              {item.phone}
+              Name: {item.name} -- Email: {item.email} -- Phone: {item.phone}
               <button onClick={() => dltBtnhandler(item)}>Delete</button>
+              <button onClick={() => editBtnHandler(item)}>Edit</button>
             </h3>
           </li>
         ))}
