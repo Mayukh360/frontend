@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
 export default function Form() {
   const [data, setData] = useState({
@@ -14,10 +15,11 @@ export default function Form() {
     }));
   };
 
-  const onSubmitHandler = (event) => {
+  const onSubmitHandler = async(event) => {
     event.preventDefault();
     // Perform any actions with the form data here, such as making an API request
     console.log(data);
+    await axios.post("http://localhost:3000/getData",data);
   };
 
   return (
