@@ -1,20 +1,17 @@
-import axios from "axios";
-import react, { useEffect, useState } from "react";
-import "./App.css";
+
 import Form from "./Component/Form";
+import { Routes, Route } from "react-router-dom";
+import LoginPage from "./Component/LoginPage";
 
 function App() {
-  // const [data, setData] = useState("");
-  // const fetchData = async () => {
-  //   const response = await axios.get("http://localhost:3000/getData");
-  //   console.log(response.data);
-  // };
-  // useEffect(() => {
-  //   fetchData();
-  // }, []);
+
   return (
     <div>
-      <Form/>
+      <Routes>
+      <Route path="/" element={<Form/>} />
+      <Route path="/login" element={<LoginPage/>} />
+      </Routes>
+     
     </div>
   );
 }

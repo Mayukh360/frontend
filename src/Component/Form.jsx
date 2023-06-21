@@ -13,6 +13,7 @@ export default function Form() {
   useEffect(() => {
     const fetchData = async () => {
       const response = await axios.get("http://localhost:3000/getData");
+      console.log(response.data)
       setUserdata(response.data);
     };
     fetchData();
