@@ -9,6 +9,7 @@ export default function Form() {
   });
   const [userData, setUserdata] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -25,6 +26,7 @@ export default function Form() {
       [event.target.name]: event.target.value,
     }));
   };
+  
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();
@@ -54,15 +56,22 @@ export default function Form() {
 
       const response = await axios.get("http://localhost:3000/getData");
       setUserdata(response.data);
-    } else {
-      await axios.post("http://localhost:3000/getData", {
-        name: event.target.name.value,
-        email: event.target.email.value,
-        phone: event.target.phone.value,
+    } else  {
+      const { name, email, phone } = data;
+      const requestData = {
+        name,
+        email,
+        phone,
+      };
+  
+      await axios.post("http://localhost:3000/getData", requestData, {
+        headers: {
+          Authorization: localStorage.getItem("token"), // Include the JWT token from local storage
+        },
       });
-
+  
       event.target.reset();
-
+  
       const response = await axios.get("http://localhost:3000/getData");
       setUserdata(response.data);
     }
@@ -96,15 +105,22 @@ export default function Form() {
         <button type="submit">{selectedItem ? "Update" : "Submit"}</button>
       </form>
       {userData &&
-        userData.map((item) => (
-          <li key={item.id}>
-            <h3>
-              Name: {item.name} -- Email: {item.email} -- Phone: {item.phone}
-              <button onClick={() => dltBtnhandler(item)}>Delete</button>
-              <button onClick={() => editBtnHandler(item)}>Edit</button>
-            </h3>
-          </li>
-        ))}
+  userData.map((item) => {
+    // Check if the product belongs to the current user
+    if (item.userId == localStorage.getItem("userId")) {
+      return (
+        <li key={item.id}>
+          <h3>
+            Name: {item.name} -- Email: {item.email} -- Phone: {item.phone}
+            <button onClick={() => dltBtnhandler(item)}>Delete</button>
+            <button onClick={() => editBtnHandler(item)}>Edit</button>
+          </h3>
+        </li>
+      );
+    } else {
+      return null; // Skip rendering if the product doesn't belong to the current user
+    }
+  })}
     </div>
   );
 }

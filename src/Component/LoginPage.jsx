@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Link, useNavigate } from 'react-router-dom';
+import {  useNavigate } from 'react-router-dom';
 
 export default function LoginPage() {
     const [name, setName] = useState('');
@@ -9,12 +9,17 @@ export default function LoginPage() {
   const[token,setToken]=useState('')
   const navigate=useNavigate()
 
+  if(token){
+    localStorage.setItem('token',token)
+  }
+
   const handleSignup = () => {
     axios
       .post('http://localhost:3000/signup', { name,email, password })
       .then((response) => {
         const { token } = response.data;
         console.log(token)
+        setToken(token)
         // Store the token in local storage or cookies
         // Perform any necessary actions after successful signup
       })
@@ -28,8 +33,11 @@ export default function LoginPage() {
     axios
       .post('http://localhost:3000/login', { email, password })
       .then((response) => {
+        
         const { token } = response.data;
-        console.log(token);
+        console.log(response.data);
+        const userId = response.data.userId; // Replace `response.data.userId` with the actual response data containing the user ID
+        localStorage.setItem("userId", userId); 
         setToken(token)
         // Store the token in local storage or cookies
         // Perform any necessary actions after successful login
