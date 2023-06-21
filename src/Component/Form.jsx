@@ -27,6 +27,9 @@ export default function Form() {
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();
+    console.log(event.target.name.value);
+    console.log(event.target.email.value);
+    console.log(event.target.phone.value);
 
     if (selectedItem) {
       const updatedData = {
@@ -81,6 +84,7 @@ export default function Form() {
 
   return (
     <div>
+      <h1>BOOKING APPOINTMENT APP</h1>
       <form onSubmit={onSubmitHandler}>
         <label>Name</label>
         <input onChange={onChangeHandler} type="text" name="name" value={data.name} />
